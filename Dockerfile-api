@@ -1,32 +1,23 @@
-From nvcr.io/nvidia/pytorch:19.04-py3
+From pytorch/pytorch
 
-RUN apt-get -y update
+RUN sed -i 's/archive.ubuntu.com/mirrors.ustc.edu.cn/g' /etc/apt/sources.list && \
+    sed -i 's/security.ubuntu.com/mirrors.ustc.edu.cn/g' /etc/apt/sources.list && \
+    apt-get -y update && \
+    apt-get install -y libsm-dev python3-pip software-properties-common wget ffmpeg && \
+    mkdir -p /root/.torch/models && \
+    mkdir -p /data/models
+    
+RUN pip install -r requirements.txt -i https://pypi.doubanio.com/simple
+RUN pip install flask pillow scikit-image requests gunicorn -i https://pypi.doubanio.com/simple
 
-RUN apt-get install -y python3-pip software-properties-common wget ffmpeg
-
-RUN apt-get -y update
-
-RUN mkdir -p /root/.torch/models
-
-RUN mkdir -p /data/models
 
 ADD . /data/
 
 WORKDIR /data
 
-RUN pip install -r requirements.txt
-
-RUN pip install  Flask
-
-RUN pip install Pillow
-
-RUN pip install scikit-image
-
-RUN pip install requests
 
 EXPOSE 5000
 
 ENTRYPOINT ["python3"]
 
 CMD ["app.py"]
-
